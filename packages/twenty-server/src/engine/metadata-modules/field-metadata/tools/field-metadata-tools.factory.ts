@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
 
 import { type ToolSet } from 'ai';
+import { FIELD_TYPE_DEFAULT_ICONS } from 'twenty-shared/constants';
 import { FieldMetadataType, RelationType } from 'twenty-shared/types';
 import { z } from 'zod';
 
 import { METADATA_TOOL_EXCLUDED_FIELD_NAMES } from 'src/engine/core-modules/tool-provider/constants/metadata-tool-excluded-field-names.constant';
 import { compactMetadataOutput } from 'src/engine/core-modules/tool-provider/utils/compact-metadata-output.util';
 import { formatValidationErrors } from 'src/engine/core-modules/tool-provider/utils/format-validation-errors.util';
+import {
+  resolveIconName,
+  withResolvedIcon,
+} from 'src/engine/core-modules/tool-provider/utils/resolve-icon-name.util';
 import { FieldMetadataService } from 'src/engine/metadata-modules/field-metadata/services/field-metadata.service';
 import { WorkspaceManyOrAllFlatEntityMapsCacheService } from 'src/engine/metadata-modules/flat-entity/services/workspace-many-or-all-flat-entity-maps-cache.service';
 import { getObjectMetadataIdByName } from 'src/engine/metadata-modules/flat-object-metadata/utils/get-object-metadata-id-by-name.util';
@@ -57,7 +62,12 @@ const CreateFieldMetadataInputSchema = z.object({
   name: z.string().describe('Field name (camelCase)'),
   label: z.string().describe('Display label'),
   description: z.string().optional().describe('Description'),
-  icon: z.string().optional().describe('Icon name'),
+  icon: z
+    .string()
+    .optional()
+    .describe(
+      'Tabler icon name, PascalCase with "Icon" prefix (e.g. IconCurrencyDollar, IconCalendarTime, IconPaw). Set one matching the field meaning; falls back to a type-based default.',
+    ),
   isNullable: z.boolean().optional().describe('Nullable'),
   isUnique: z.boolean().optional().describe('Unique constraint'),
   defaultValue: z.unknown().optional().describe('Default value'),
@@ -79,7 +89,10 @@ const UpdateFieldMetadataInputSchema = z.object({
   name: z.string().optional().describe('Field name'),
   label: z.string().optional().describe('Display label'),
   description: z.string().optional().describe('Description'),
-  icon: z.string().optional().describe('Icon name'),
+  icon: z
+    .string()
+    .optional()
+    .describe('Tabler icon name (e.g. IconCurrencyDollar)'),
   isActive: z.boolean().optional().describe('Active state'),
   isNullable: z.boolean().optional().describe('Nullable'),
   isUnique: z.boolean().optional().describe('Unique constraint'),
@@ -120,17 +133,69 @@ const CreateManyRelationFieldsInputSchema = z.object({
         name: z.string().describe('Field name (camelCase)'),
         label: z.string().describe('Display label'),
         description: z.string().optional().describe('Description'),
-        icon: z.string().optional().describe('Icon name'),
+        icon: z
+          .string()
+          .optional()
+          .describe('Tabler icon name for the relation field (e.g. IconUsers)'),
         type: z.nativeEnum(RelationType).describe('MANY_TO_ONE or ONE_TO_MANY'),
         targetObjectMetadataId: z.string().uuid().describe('Target object ID'),
         targetFieldLabel: z.string().describe('Inverse field label'),
-        targetFieldIcon: z.string().describe('Inverse field icon'),
+        targetFieldIcon: z
+          .string()
+          .describe(
+            'Inverse field Tabler icon name (e.g. IconBuildingSkyscraper)',
+          ),
       }),
     )
     .min(1)
     .max(20)
     .describe('Relations to create (max 20).'),
 });
+
+// Fields always get an icon: the normalized provided one, or the type-based
+// default. The relation payload's targetFieldIcon is resolved the same way so
+// the inverse field gets one too.
+const withResolvedCreateFieldIcons = <
+  TCreateFieldInput extends {
+    type: FieldMetadataType;
+    icon?: string;
+    relationCreationPayload?: unknown;
+  },
+>(
+  createFieldInput: TCreateFieldInput,
+): TCreateFieldInput => {
+  const resolvedFieldInput = withResolvedIcon(createFieldInput);
+  const fieldInputWithIcon = {
+    ...resolvedFieldInput,
+    icon:
+      resolvedFieldInput.icon ??
+      FIELD_TYPE_DEFAULT_ICONS[createFieldInput.type],
+  };
+
+  const { relationCreationPayload } = fieldInputWithIcon;
+
+  if (
+    !isDefined(relationCreationPayload) ||
+    typeof relationCreationPayload !== 'object' ||
+    Array.isArray(relationCreationPayload)
+  ) {
+    return fieldInputWithIcon;
+  }
+
+  const { targetFieldIcon } = relationCreationPayload as {
+    targetFieldIcon?: string;
+  };
+
+  return {
+    ...fieldInputWithIcon,
+    relationCreationPayload: {
+      ...relationCreationPayload,
+      targetFieldIcon:
+        resolveIconName(targetFieldIcon) ??
+        FIELD_TYPE_DEFAULT_ICONS[FieldMetadataType.RELATION],
+    },
+  };
+};
 
 @Injectable()
 export class FieldMetadataToolsFactory {
@@ -251,7 +316,9 @@ export class FieldMetadataToolsFactory {
           try {
             const flatFieldMetadata =
               await this.fieldMetadataService.createOneField({
-                createFieldInput: parameters as Parameters<
+                createFieldInput: withResolvedCreateFieldIcons(
+                  parameters,
+                ) as Parameters<
                   typeof this.fieldMetadataService.createOneField
                 >[0]['createFieldInput'],
                 workspaceId,
@@ -295,7 +362,10 @@ export class FieldMetadataToolsFactory {
 
             const flatFieldMetadata =
               await this.fieldMetadataService.updateOneField({
-                updateFieldInput: { id, ...update } as Parameters<
+                updateFieldInput: {
+                  id,
+                  ...withResolvedIcon(update),
+                } as Parameters<
                   typeof this.fieldMetadataService.updateOneField
                 >[0]['updateFieldInput'],
                 workspaceId,
@@ -359,7 +429,9 @@ export class FieldMetadataToolsFactory {
         }) => {
           try {
             await this.fieldMetadataService.createManyFields({
-              createFieldInputs: parameters.fields as Parameters<
+              createFieldInputs: parameters.fields.map(
+                withResolvedCreateFieldIcons,
+              ) as Parameters<
                 typeof this.fieldMetadataService.createManyFields
               >[0]['createFieldInputs'],
               workspaceId,
@@ -398,7 +470,10 @@ export class FieldMetadataToolsFactory {
             await Promise.all(
               parameters.fields.map(async ({ id, ...update }) => {
                 await this.fieldMetadataService.updateOneField({
-                  updateFieldInput: { id, ...update } as Parameters<
+                  updateFieldInput: {
+                    id,
+                    ...withResolvedIcon(update),
+                  } as Parameters<
                     typeof this.fieldMetadataService.updateOneField
                   >[0]['updateFieldInput'],
                   workspaceId,
@@ -439,12 +514,16 @@ export class FieldMetadataToolsFactory {
                 name: relation.name,
                 label: relation.label,
                 description: relation.description,
-                icon: relation.icon,
+                icon:
+                  resolveIconName(relation.icon) ??
+                  FIELD_TYPE_DEFAULT_ICONS[FieldMetadataType.RELATION],
                 relationCreationPayload: {
                   type: relation.type,
                   targetObjectMetadataId: relation.targetObjectMetadataId,
                   targetFieldLabel: relation.targetFieldLabel,
-                  targetFieldIcon: relation.targetFieldIcon,
+                  targetFieldIcon:
+                    resolveIconName(relation.targetFieldIcon) ??
+                    FIELD_TYPE_DEFAULT_ICONS[FieldMetadataType.RELATION],
                 },
               })) as Parameters<
                 typeof this.fieldMetadataService.createManyFields
