@@ -66,28 +66,28 @@ describe('formatNumber', () => {
     });
 
     it('should abbreviate thousands with default decimals (0)', () => {
-      expect(formatNumber(1234, { abbreviate: true })).toEqual('1k');
+      expect(formatNumber(1234, { abbreviate: true })).toEqual('1 тыс');
     });
 
     it('should abbreviate thousands with provided decimals', () => {
       expect(formatNumber(1234, { abbreviate: true, decimals: 2 })).toEqual(
-        '1.23k',
+        '1.23 тыс',
       );
       expect(formatNumber(1234, { abbreviate: true, decimals: 1 })).toEqual(
-        '1.2k',
+        '1.2 тыс',
       );
     });
 
     it('should abbreviate millions', () => {
       expect(formatNumber(1234567, { abbreviate: true, decimals: 2 })).toEqual(
-        '1.23M',
+        '1.23 млн',
       );
     });
 
     it('should abbreviate billions', () => {
       expect(
         formatNumber(1500000000, { abbreviate: true, decimals: 1 }),
-      ).toEqual('1.5B');
+      ).toEqual('1.5 млрд');
     });
 
     it('should use locale/format for decimal separator when abbreviating', () => {
@@ -97,7 +97,7 @@ describe('formatNumber', () => {
           decimals: 2,
           format: NumberFormat.SPACES_AND_COMMA,
         }),
-      ).toEqual('1,23M');
+      ).toEqual('1,23 млн');
 
       expect(
         formatNumber(1234567, {
@@ -105,7 +105,7 @@ describe('formatNumber', () => {
           decimals: 2,
           format: NumberFormat.DOTS_AND_COMMA,
         }),
-      ).toEqual('1,23M');
+      ).toEqual('1,23 млн');
 
       expect(
         formatNumber(1234567, {
@@ -113,7 +113,7 @@ describe('formatNumber', () => {
           decimals: 2,
           format: NumberFormat.COMMAS_AND_DOT,
         }),
-      ).toEqual('1.23M');
+      ).toEqual('1.23 млн');
     });
 
     it('should preserve sign for negative values', () => {
