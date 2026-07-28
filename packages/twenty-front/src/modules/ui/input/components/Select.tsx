@@ -262,6 +262,9 @@ export const Select = <Value extends SelectValue>({
                         key={`${option.value}-${option.label}`}
                         itemId={option.label}
                         onEnter={() => {
+                          if (option.disabled) {
+                            return;
+                          }
                           onChange?.(option.value);
                           onBlur?.();
                           closeDropdown(dropdownId);
@@ -271,6 +274,7 @@ export const Select = <Value extends SelectValue>({
                           LeftIcon={option.Icon}
                           leftIconColor={option.iconThemeColor}
                           text={option.label}
+                          disabled={option.disabled}
                           contextualText={option.contextualText}
                           selected={
                             controlSelectedOption.value === option.value
@@ -278,6 +282,9 @@ export const Select = <Value extends SelectValue>({
                           focused={selectedItemId === option.label}
                           needIconCheck={needIconCheck}
                           onClick={() => {
+                            if (option.disabled) {
+                              return;
+                            }
                             onChange?.(option.value);
                             onBlur?.();
                             closeDropdown(dropdownId);
