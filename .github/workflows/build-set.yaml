@@ -1,0 +1,91 @@
+# Сборка собственного образа Twenty для ГК СЭТ.
+#
+# Зачем: мы отказались от автоматических обновлений и правим ядро под свои задачи
+# (см. README и ADR 0001 в репозитории проекта «ГК СЭТ»). Собирать образ негде,
+# кроме как здесь: на рабочем Mac свободно 7,7 ГБ диска, на сервере 3,9 ГБ ОЗУ.
+#
+# Результат: ghcr.io/<владелец>/twenty-set:<базовая версия>-set.<номер сборки>
+# Сервер переключается сменой TAG в /opt/twenty/.env и `docker compose pull && up -d`.
+
+name: Сборка образа ГК СЭТ
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_version:
+        description: 'Базовая версия Twenty (попадёт в тег образа)'
+        required: true
+        default: 'v2.24.1'
+  push:
+    branches: [set/main]
+    # Правки документации образ не меняют — не тратим на них полчаса сборки.
+    paths-ignore: ['**.md', 'packages/twenty-website/**', 'packages/twenty-docs/**']
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/twenty-set
+  BASE_VERSION: ${{ github.event.inputs.base_version || 'v2.24.1' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Забрать исходники
+        uses: actions/checkout@v4
+
+      - name: Освободить место на исполнителе
+        # Сборка фронтенда прожорлива по диску, а на исполнителе предустановлено
+        # много ненужного нам (Android SDK, .NET, Haskell). Без этого сборка
+        # может упасть на «no space left on device».
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup
+          df -h /
+
+      - name: Подготовить buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Войти в реестр GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Вычислить теги
+        id: meta
+        run: |
+          short="$(git rev-parse --short HEAD)"
+          echo "tags=${IMAGE}:${BASE_VERSION}-set.${{ github.run_number }},${IMAGE}:${BASE_VERSION}-${short}" >> "$GITHUB_OUTPUT"
+          echo "version=${BASE_VERSION}-set.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Собрать и опубликовать
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: packages/twenty-docker/twenty/Dockerfile
+          # Цель «twenty» — сервер вместе с фронтендом, как в официальном образе.
+          target: twenty
+          # Сервер на VPS — обычный amd64. Сборка под arm64 удвоила бы время впустую.
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: APP_VERSION=${{ steps.meta.outputs.version }}
+          # Кэш слоёв между сборками: без него каждая сборка ставит зависимости заново.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Что делать дальше
+        run: |
+          echo "Образ собран: ${{ steps.meta.outputs.version }}"
+          echo ""
+          echo "На сервере (после бэкапа!):"
+          echo "  cd /opt/twenty"
+          echo "  # в .env заменить строку TAG на:"
+          echo "  #   TAG=${{ steps.meta.outputs.version }}"
+          echo "  # и указать наш реестр вместо официального образа"
+          echo "  docker compose pull && docker compose up -d"
+          echo ""
+          echo "Откат: вернуть прежнее значение TAG и повторить up -d."
