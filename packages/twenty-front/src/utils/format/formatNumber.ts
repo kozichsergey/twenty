@@ -62,14 +62,17 @@ export const formatNumber = (
     let suffix = '';
     let divisor = 1;
 
+    // Русские сокращения вместо B/M/k: интерфейс русский, и «18.9m» рядом
+    // с рублями читается плохо. Пробел перед сокращением — по правилам русской
+    // типографики («18,9 млн», а не «18,9млн»).
     if (abs >= 1e9) {
-      suffix = 'B';
+      suffix = ' млрд';
       divisor = 1e9;
     } else if (abs >= 1e6) {
-      suffix = 'M';
+      suffix = ' млн';
       divisor = 1e6;
     } else if (abs >= 1e3) {
-      suffix = 'k';
+      suffix = ' тыс';
       divisor = 1e3;
     }
 
