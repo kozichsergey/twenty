@@ -60,6 +60,8 @@ export const getPageTitleFromPath = (pathname: string): string => {
     case SettingsPathPrefixes.Community:
       return t`Community - Settings`;
     default:
-      return 'Twenty';
+      // Название системы ГК СЭТ. Приложение переставляет заголовок вкладки
+      // после загрузки, поэтому правки одного index.html недостаточно.
+      return 'CRM «ГК СЭТ»';
   }
 };
