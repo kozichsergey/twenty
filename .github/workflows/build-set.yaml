@@ -21,6 +21,13 @@ on:
     # Правки документации образ не меняют — не тратим на них полчаса сборки.
     paths-ignore: ['**.md', 'packages/twenty-website/**', 'packages/twenty-docs/**']
 
+# Правки часто идут несколькими коммитами подряд. Без этого каждая из них
+# запускала бы свою сборку, и мы платили бы получасом за промежуточные состояния.
+# Держим одну сборку: новая отменяет предыдущую.
+concurrency:
+  group: sborka-obraza
+  cancel-in-progress: true
+
 env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/twenty-set
   BASE_VERSION: ${{ github.event.inputs.base_version || 'v2.24.1' }}
