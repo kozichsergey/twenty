@@ -6,6 +6,7 @@ export interface AddPersonEmailFiltersToQueryBuilderOptions {
   queryBuilder: SelectQueryBuilder<PersonWorkspaceEntity>;
   emails: string[];
   excludePersonIds?: string[];
+  includeDeleted?: boolean;
 }
 
 /**
@@ -17,11 +18,17 @@ export interface AddPersonEmailFiltersToQueryBuilderOptions {
  * @param queryBuilder - The query builder to add the filters to
  * @param emails - The emails to filter by
  * @param excludePersonIds - The person IDs to exclude from the results
+ * @param includeDeleted - Whether soft-deleted people are returned as well
+ *
+ * ГК СЭТ: раньше удалённые записи возвращались всегда. Из-за этого письмо
+ * от клиента привязывалось к контакту, лежащему в корзине, а новый контакт
+ * с тем же адресом не создавался. Теперь удалённые нужно запрашивать явно.
  */
 export function addPersonEmailFiltersToQueryBuilder({
   queryBuilder,
   emails,
   excludePersonIds = [],
+  includeDeleted = false,
 }: AddPersonEmailFiltersToQueryBuilderOptions): SelectQueryBuilder<PersonWorkspaceEntity> {
   const normalizedEmails = emails.map((email) => email.toLowerCase());
 
@@ -34,8 +41,11 @@ export function addPersonEmailFiltersToQueryBuilder({
     ])
     .where('LOWER(person.emailsPrimaryEmail) IN (:...emails)', {
       emails: normalizedEmails,
-    })
-    .withDeleted();
+    });
+
+  if (includeDeleted) {
+    queryBuilder = queryBuilder.withDeleted();
+  }
 
   if (excludePersonIds.length > 0) {
     queryBuilder = queryBuilder.andWhere(
@@ -59,7 +69,9 @@ export function addPersonEmailFiltersToQueryBuilder({
     });
   }
 
-  queryBuilder = queryBuilder.withDeleted();
+  if (includeDeleted) {
+    queryBuilder = queryBuilder.withDeleted();
+  }
 
   return queryBuilder;
 }

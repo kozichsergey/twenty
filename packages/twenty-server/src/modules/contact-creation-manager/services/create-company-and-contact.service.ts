@@ -105,9 +105,14 @@ export class CreateCompanyAndPersonService {
           emails: uniqueHandles,
         });
 
+        // ГК СЭТ: удалённые контакты сюда не попадают намеренно.
+        // В исходном поведении контакт из корзины считался существующим
+        // и «восстанавливался» при новом письме. Владелец решил иначе:
+        // если контакт удалили, новое письмо должно заводить новый контакт.
+        // Ветка восстановления ниже остаётся нетронутой — она просто
+        // перестаёт срабатывать; так меньше расхождений с upstream.
         const alreadyCreatedPeople = await queryBuilder
           .orderBy('person.createdAt', 'ASC')
-          .withDeleted()
           .getMany();
 
         const {

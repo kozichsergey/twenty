@@ -134,4 +134,31 @@ describe('addPersonEmailFiltersToQueryBuilder', () => {
       expect(result).toBe(mockQueryBuilder);
     },
   );
+
+  // ГК СЭТ: удалённые записи по умолчанию не возвращаются. Иначе письмо
+  // от клиента привязывается к контакту из корзины, а новый не создаётся.
+  it('не запрашивает удалённые записи по умолчанию', () => {
+    addPersonEmailFiltersToQueryBuilder({
+      queryBuilder:
+        mockQueryBuilder as SelectQueryBuilder<PersonWorkspaceEntity>,
+      emails: ['test@example.com'],
+    });
+
+    expect(
+      queryBuilderCalls.some(({ method }) => method === 'withDeleted'),
+    ).toBe(false);
+  });
+
+  it('запрашивает удалённые записи, когда это указано явно', () => {
+    addPersonEmailFiltersToQueryBuilder({
+      queryBuilder:
+        mockQueryBuilder as SelectQueryBuilder<PersonWorkspaceEntity>,
+      emails: ['test@example.com'],
+      includeDeleted: true,
+    });
+
+    expect(
+      queryBuilderCalls.some(({ method }) => method === 'withDeleted'),
+    ).toBe(true);
+  });
 });

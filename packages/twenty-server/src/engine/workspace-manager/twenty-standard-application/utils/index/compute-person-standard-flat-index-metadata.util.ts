@@ -36,6 +36,13 @@ export const buildPersonStandardFlatIndexMetadatas = ({
       indexName: 'emailsUniqueIndex',
       relatedFieldNames: ['emails'],
       isUnique: true,
+      // ГК СЭТ: уникальность адреса действует только на живых записях.
+      // Без этого условия удалённый контакт продолжает занимать адрес,
+      // и новый контакт с тем же адресом база не примет — а письмо от клиента
+      // молча привязывается к записи, лежащей в корзине.
+      // Такое же условие Twenty уже применяет на messageChannelMessageAssociation
+      // и messageListMember, так что механизм миграций его поддерживает.
+      indexWhereClause: '"deletedAt" IS NULL',
       hasDeterministicUniversalIdentifier: true,
     },
     standardObjectMetadataRelatedEntityIds,

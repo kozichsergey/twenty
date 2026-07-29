@@ -26,10 +26,6 @@ exports[`addPersonEmailFiltersToQueryBuilder case-insensitive email normalizatio
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.emailsAdditionalEmails @> :email0::jsonb",
       {
@@ -46,10 +42,6 @@ exports[`addPersonEmailFiltersToQueryBuilder case-insensitive email normalizatio
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -79,10 +71,6 @@ exports[`addPersonEmailFiltersToQueryBuilder emails with empty exclusion array: 
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.emailsAdditionalEmails @> :email0::jsonb",
       {
@@ -90,10 +78,6 @@ exports[`addPersonEmailFiltersToQueryBuilder emails with empty exclusion array: 
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -119,14 +103,6 @@ exports[`addPersonEmailFiltersToQueryBuilder empty emails array: should handle e
       },
     ],
     "method": "where",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -155,10 +131,6 @@ exports[`addPersonEmailFiltersToQueryBuilder multiple emails with exclusions: sh
       },
     ],
     "method": "where",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
   {
     "args": [
@@ -195,10 +167,6 @@ exports[`addPersonEmailFiltersToQueryBuilder multiple emails with exclusions: sh
     ],
     "method": "orWhere",
   },
-  {
-    "args": [],
-    "method": "withDeleted",
-  },
 ]
 `;
 
@@ -228,10 +196,6 @@ exports[`addPersonEmailFiltersToQueryBuilder multiple emails without exclusions:
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.emailsAdditionalEmails @> :email0::jsonb",
       {
@@ -248,10 +212,6 @@ exports[`addPersonEmailFiltersToQueryBuilder multiple emails without exclusions:
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -281,10 +241,6 @@ exports[`addPersonEmailFiltersToQueryBuilder single email with person ID exclusi
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.id NOT IN (:...excludePersonIds)",
       {
@@ -308,10 +264,6 @@ exports[`addPersonEmailFiltersToQueryBuilder single email with person ID exclusi
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -341,10 +293,6 @@ exports[`addPersonEmailFiltersToQueryBuilder single email without exclusions: sh
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.emailsAdditionalEmails @> :email0::jsonb",
       {
@@ -352,10 +300,6 @@ exports[`addPersonEmailFiltersToQueryBuilder single email without exclusions: sh
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
@@ -387,10 +331,6 @@ exports[`addPersonEmailFiltersToQueryBuilder three emails with unique parameter 
     "method": "where",
   },
   {
-    "args": [],
-    "method": "withDeleted",
-  },
-  {
     "args": [
       "person.emailsAdditionalEmails @> :email0::jsonb",
       {
@@ -416,10 +356,6 @@ exports[`addPersonEmailFiltersToQueryBuilder three emails with unique parameter 
       },
     ],
     "method": "orWhere",
-  },
-  {
-    "args": [],
-    "method": "withDeleted",
   },
 ]
 `;
