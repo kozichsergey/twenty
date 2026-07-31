@@ -4,6 +4,8 @@ declare const classNames: {
   readonly weightMedium: 'weightMedium';
   readonly variantOutline: 'variantOutline';
   readonly variantBorder: 'variantBorder';
+  readonly variantDot: 'variantDot';
+  readonly dot: 'dot';
   readonly preventShrink: 'preventShrink';
   readonly preventPadding: 'preventPadding';
   readonly content: 'content';
