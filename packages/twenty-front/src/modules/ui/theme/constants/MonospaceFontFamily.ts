@@ -1,1 +1,1 @@
-export const MONOSPACE_FONT_FAMILY = `'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace`;
+export const MONOSPACE_FONT_FAMILY = `'IBM Plex Mono', ui-monospace, monospace`;
