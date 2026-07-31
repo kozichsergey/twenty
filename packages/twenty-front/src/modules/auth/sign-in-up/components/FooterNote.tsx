@@ -2,41 +2,30 @@ import { styled } from '@linaria/react';
 import { Trans } from '@lingui/react/macro';
 
 import { useWorkspaceBypass } from '@/auth/sign-in-up/hooks/useWorkspaceBypass';
-import { useIsCurrentLocationOnAWorkspace } from '@/domain-manager/hooks/useIsCurrentLocationOnAWorkspace';
-import { ONBOARDING_CONTENT_BLOCK_WIDTH } from '@/onboarding/constants/OnboardingContentBlockWidth';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 
-const StyledCopyContainer = styled.div`
-  align-items: center;
-  color: ${themeCssVariables.font.color.tertiary};
-  font-size: ${themeCssVariables.font.size.sm};
-  line-height: 1.4;
-  max-width: ${ONBOARDING_CONTENT_BLOCK_WIDTH}px;
-  text-align: center;
-
-  & > a {
-    color: ${themeCssVariables.font.color.tertiary};
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-`;
+/**
+ * [set] Подвал экрана входа.
+ *
+ * Отсюда убраны ссылки «Условия обслуживания» и «Политика конфиденциальности»
+ * и фраза «Пользуясь Twenty, вы соглашаетесь…»: они вели на twenty.com/legal.
+ * Это чужие документы чужой компании, и показывать их нашим сотрудникам как
+ * свои — неправда. Своих у нас нет; появятся — встанут на это место.
+ *
+ * Осталась кнопка обхода единого входа: она не про марку, а про то, как
+ * попасть внутрь, когда SSO не отвечает.
+ */
 
 const StyledLinksContainer = styled.div`
   align-items: center;
   color: ${themeCssVariables.font.color.tertiary};
   display: flex;
-  flex-wrap: nowrap;
   font-size: ${themeCssVariables.font.size.sm};
-  gap: ${themeCssVariables.spacing[2]};
   justify-content: center;
   max-width: 100%;
   text-align: center;
   white-space: nowrap;
 
-  & > a,
   & > button {
     background: none;
     border: none;
@@ -52,81 +41,24 @@ const StyledLinksContainer = styled.div`
   }
 `;
 
-const StyledSeparator = styled.span`
-  color: ${themeCssVariables.font.color.tertiary};
-`;
-
 type FooterNoteProps = {
+  /** Оставлено ради вызывающих: соглашения больше не показываются. */
   secondaryAgreement?: 'privacyPolicy' | 'dataProcessingAgreement';
 };
 
-export const FooterNote = ({
-  secondaryAgreement = 'privacyPolicy',
-}: FooterNoteProps) => {
-  const { isOnAWorkspace } = useIsCurrentLocationOnAWorkspace();
-
+export const FooterNote = (_props: FooterNoteProps) => {
   const { shouldOfferBypass, shouldUseBypass, enableBypass } =
     useWorkspaceBypass();
 
-  if (!isOnAWorkspace) {
-    return (
-      <StyledCopyContainer>
-        <Trans>By using Twenty, you agree to the</Trans>{' '}
-        <a
-          href="https://twenty.com/legal/terms"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Trans>Terms of Service</Trans>
-        </a>{' '}
-        <Trans>and</Trans>{' '}
-        {secondaryAgreement === 'dataProcessingAgreement' ? (
-          <a
-            href="https://twenty.com/legal/dpa"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Trans>Data Processing Agreement</Trans>
-          </a>
-        ) : (
-          <a
-            href="https://twenty.com/legal/privacy"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Trans>Privacy Policy</Trans>
-          </a>
-        )}
-        .
-      </StyledCopyContainer>
-    );
+  if (!shouldOfferBypass || shouldUseBypass) {
+    return null;
   }
 
   return (
     <StyledLinksContainer>
-      {shouldOfferBypass && !shouldUseBypass && (
-        <>
-          <button type="button" onClick={enableBypass}>
-            <Trans>Bypass SSO</Trans>
-          </button>
-          <StyledSeparator>•</StyledSeparator>
-        </>
-      )}
-      <a
-        href="https://twenty.com/legal/privacy"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Trans>Privacy Policy</Trans>
-      </a>
-      <StyledSeparator>•</StyledSeparator>
-      <a
-        href="https://twenty.com/legal/terms"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <Trans>Terms of Service</Trans>
-      </a>
+      <button type="button" onClick={enableBypass}>
+        <Trans>Bypass SSO</Trans>
+      </button>
     </StyledLinksContainer>
   );
 };

@@ -1,4 +1,3 @@
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
 
 import { useAuth } from '@/auth/hooks/useAuth';
 import { availableWorkspacesState } from '@/auth/states/availableWorkspacesState';
@@ -103,11 +102,10 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
         StartComponent={
           <DropdownMenuHeaderLeftComponent
             Avatar={
+              /* [set] Без запасного логотипа: нет своего — буква названия. */
               <Avatar
                 placeholder={currentWorkspace?.displayName || ''}
-                avatarUrl={getAbsoluteImageUrl(
-                  currentWorkspace?.logo ?? DEFAULT_WORKSPACE_LOGO,
-                )}
+                avatarUrl={getAbsoluteImageUrl(currentWorkspace?.logo)}
               />
             }
           />
@@ -171,7 +169,7 @@ export const MultiWorkspaceDropdownDefaultComponents = () => {
                       <Avatar
                         placeholder={availableWorkspace.displayName || ''}
                         avatarUrl={getAbsoluteImageUrl(
-                          availableWorkspace.logo ?? DEFAULT_WORKSPACE_LOGO,
+                          availableWorkspace.logo,
                         )}
                       />
                     }

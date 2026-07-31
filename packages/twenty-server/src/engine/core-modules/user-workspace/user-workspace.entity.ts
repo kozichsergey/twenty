@@ -4,7 +4,7 @@ import {
   PermissionFlagType,
   PermissionsOnAllObjectRecords,
 } from 'twenty-shared/constants';
-import { type APP_LOCALES, SOURCE_LOCALE } from 'twenty-shared/translations';
+import { type APP_LOCALES } from 'twenty-shared/translations';
 import {
   Column,
   CreateDateColumn,
@@ -65,8 +65,11 @@ export class UserWorkspaceEntity extends WorkspaceRelatedEntity {
   @Column({ nullable: true })
   defaultAvatarUrl: string;
 
+  // [set] Язык участника рабочей области по умолчанию — русский.
+  // См. тот же комментарий в `user.entity.ts`: `SOURCE_LOCALE` — это язык
+  // строк в коде, а не выбор для человека.
   @Field(() => String, { nullable: false })
-  @Column({ nullable: false, default: SOURCE_LOCALE, type: 'varchar' })
+  @Column({ nullable: false, default: 'ru-RU', type: 'varchar' })
   locale: keyof typeof APP_LOCALES;
 
   @Field()

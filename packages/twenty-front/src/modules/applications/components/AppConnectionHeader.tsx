@@ -1,9 +1,20 @@
 import { styled } from '@linaria/react';
 import { useContext, useState } from 'react';
 import { isNonEmptyString } from '@sniptt/guards';
+import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
+import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
+import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
 import { Avatar } from 'twenty-ui/data-display';
 import { IconRefresh } from 'twenty-ui/icon';
 import { ThemeContext, themeCssVariables } from 'twenty-ui/theme-constants';
+
+/**
+ * [set] Две плитки на экране согласия: слева мы, справа приложение.
+ *
+ * Слева был зашит `twenty-logo.svg`. Экран отвечает на вопрос «пускать ли это
+ * приложение к моим данным», и первое, что человек должен узнать в ответе, —
+ * свою рабочую область, а не марку движка, на котором она работает.
+ */
 
 type AppConnectionHeaderProps = {
   appLogoUrl?: string | null;
@@ -32,11 +43,13 @@ const StyledAppLogoTile = styled.div`
   width: ${themeCssVariables.spacing[12]};
 `;
 
+/* [set] `contain`, а не `cover`: логотип бывает широким, и обрезка по квадрату
+   оставила бы от слова середину. */
 const StyledAppLogo = styled.img`
   border-radius: ${themeCssVariables.border.radius.sm};
-  height: ${themeCssVariables.spacing[10]};
-  object-fit: cover;
-  width: ${themeCssVariables.spacing[10]};
+  max-height: ${themeCssVariables.spacing[10]};
+  max-width: ${themeCssVariables.spacing[10]};
+  object-fit: contain;
 `;
 
 const StyledLinkIconContainer = styled.div`
@@ -58,15 +71,26 @@ export const AppConnectionHeader = ({
   appName,
 }: AppConnectionHeaderProps) => {
   const { theme } = useContext(ThemeContext);
+  const currentWorkspace = useAtomStateValue(currentWorkspaceState);
 
   const [hasAppLogoError, setHasAppLogoError] = useState(false);
 
   const showAppLogoImage = isNonEmptyString(appLogoUrl) && !hasAppLogoError;
+  const workspaceLogoUrl = getAbsoluteImageUrl(currentWorkspace?.logo);
 
   return (
     <StyledContainer>
       <StyledAppLogoTile>
-        <StyledAppLogo src={'/images/integrations/twenty-logo.svg'} alt="" />
+        {isNonEmptyString(workspaceLogoUrl) ? (
+          <StyledAppLogo src={workspaceLogoUrl} alt="" />
+        ) : (
+          <Avatar
+            size="xl"
+            placeholder={currentWorkspace?.displayName ?? ''}
+            placeholderColorSeed={currentWorkspace?.displayName ?? ''}
+            type="squared"
+          />
+        )}
       </StyledAppLogoTile>
       <StyledLinkIconContainer aria-hidden>
         <IconRefresh size={theme.icon.size.md} stroke={theme.icon.stroke.lg} />

@@ -1,6 +1,6 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 
-import { APP_LOCALES, SOURCE_LOCALE } from 'twenty-shared/translations';
+import { APP_LOCALES } from 'twenty-shared/translations';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -88,8 +88,13 @@ export class UserEntity {
   @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
 
+  // [set] Язык по умолчанию — русский, а не язык исходников.
+  // `SOURCE_LOCALE` означает «язык, на котором написаны строки в коде», то есть
+  // английский, и как умолчание для нового человека он подходил только потому,
+  // что совпадал. У нас интерфейс переведён, и новый сотрудник, зайдя первый
+  // раз, должен видеть русский — иначе перевода он просто не заметит.
   @Field(() => String, { nullable: false })
-  @Column({ nullable: false, default: SOURCE_LOCALE, type: 'varchar' })
+  @Column({ nullable: false, default: 'ru-RU', type: 'varchar' })
   locale: keyof typeof APP_LOCALES;
 
   @OneToMany(() => AppTokenEntity, (appToken) => appToken.user, {

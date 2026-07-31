@@ -1,2 +1,14 @@
-export const DEFAULT_WORKSPACE_LOGO =
-  'https://twentyhq.github.io/placeholder-images/workspaces/twenty-logo.png';
+/**
+ * [set] Запасного логотипа рабочей области больше нет.
+ *
+ * Здесь лежал адрес `twentyhq.github.io/placeholder-images/…/twenty-logo.png`.
+ * Два изъяна сразу: рабочая область без логотипа показывала чужую марку, и —
+ * что хуже — за картинкой ходили в чужой домен из-под нашего интерфейса.
+ *
+ * Теперь запаса нет вовсе: `Avatar` без адреса сам рисует букву из названия
+ * рабочей области. Это наше и не требует сети.
+ *
+ * Значение оставлено объявленным, чтобы не осиротить возможные ссылки после
+ * слияния с upstream; использовать его не нужно.
+ */
+export const DEFAULT_WORKSPACE_LOGO = undefined;

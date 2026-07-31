@@ -6,7 +6,6 @@ import {
   StyledLabelWrapper,
 } from '@/ui/navigation/navigation-drawer/components/MultiWorkspaceDropdown/internal/MultiWorkspacesDropdownStyles';
 import { NavigationDrawerAnimatedCollapseWrapper } from '@/ui/navigation/navigation-drawer/components/NavigationDrawerAnimatedCollapseWrapper';
-import { DEFAULT_WORKSPACE_LOGO } from '@/ui/navigation/navigation-drawer/constants/DefaultWorkspaceLogo';
 import { isNavigationDrawerExpandedState } from '@/ui/navigation/states/isNavigationDrawerExpanded';
 import { useAtomStateValue } from '@/ui/utilities/state/jotai/hooks/useAtomStateValue';
 import { getAbsoluteImageUrl } from '~/utils/image/getAbsoluteImageUrl';
@@ -33,11 +32,11 @@ export const MultiWorkspaceDropdownClickableComponent = ({
       isNavigationDrawerExpanded={isNavigationDrawerExpanded}
       disabled={disabled}
     >
+      {/* [set] Без запасного логотипа: нет своего — рисуется буква названия,
+          а не марка Twenty из чужого домена. */}
       <Avatar
         placeholder={currentWorkspace?.displayName || ''}
-        avatarUrl={getAbsoluteImageUrl(
-          currentWorkspace?.logo ?? DEFAULT_WORKSPACE_LOGO,
-        )}
+        avatarUrl={getAbsoluteImageUrl(currentWorkspace?.logo)}
       />
       <StyledLabelWrapper>
         <NavigationDrawerAnimatedCollapseWrapper>

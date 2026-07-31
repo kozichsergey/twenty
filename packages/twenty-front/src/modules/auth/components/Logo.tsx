@@ -1,109 +1,73 @@
 import { styled } from '@linaria/react';
 import { isNonEmptyString } from '@sniptt/guards';
 import { AppPath } from 'twenty-shared/types';
-import { getImageAbsoluteURI, isDefined } from 'twenty-shared/utils';
-import { Avatar } from 'twenty-ui/data-display';
-import { UndecoratedLink } from 'twenty-ui/navigation';
+import { getImageAbsoluteURI } from 'twenty-shared/utils';
 import { themeCssVariables } from 'twenty-ui/theme-constants';
 import { REACT_APP_SERVER_BASE_URL } from '~/config';
-import { useRedirectToDefaultDomain } from '~/modules/domain-manager/hooks/useRedirectToDefaultDomain';
+
+/**
+ * [set] Знак на экранах входа — только наш и только один.
+ *
+ * В исходном виде компонент рисовал два знака сразу: большой квадрат
+ * с логотипом Twenty (он подставлялся всегда, когда `primaryLogo` не задан)
+ * и поверх него, наклейкой в углу, логотип рабочей области. Получалось, что
+ * человека на входе встречает чужая марка, а наша выглядит приклеенной сбоку.
+ *
+ * Теперь знак один — логотип рабочей области. Стороннего нет вовсе: ни как
+ * запасного варианта, ни как подложки. Нет логотипа у рабочей области —
+ * не будет и знака: пустое место честнее чужого, а куда человек попал,
+ * говорит заголовок под ним.
+ *
+ * Логотип вписывается целиком (`contain`), а не обрезается по квадрату:
+ * наш широкий, и `cover` оставил бы от слова середину.
+ */
 
 type LogoProps = {
   primaryLogo?: string | null;
   secondaryLogo?: string | null;
+  /** Больше не рисуется: буква вместо логотипа — заглушка, а не знак. */
   placeholder?: string | null;
   onClick?: () => void;
   to?: AppPath;
 };
 
 const StyledContainer = styled.div`
+  align-items: center;
+  display: flex;
   height: ${themeCssVariables.spacing[12]};
+  justify-content: center;
   margin-bottom: ${themeCssVariables.spacing[4]};
   margin-top: ${themeCssVariables.spacing[4]};
-
-  position: relative;
-  width: ${themeCssVariables.spacing[12]};
 `;
 
-const StyledSecondaryLogo = styled.img`
-  border-radius: ${themeCssVariables.border.radius.xs};
-  height: ${themeCssVariables.spacing[6]};
-  width: ${themeCssVariables.spacing[6]};
+const StyledLogo = styled.img`
+  display: block;
+  max-height: 100%;
+  max-width: ${themeCssVariables.spacing[32]};
+  object-fit: contain;
 `;
 
-const StyledSecondaryLogoContainer = styled.div`
-  align-items: center;
-  background-color: ${themeCssVariables.background.primary};
-  border-radius: ${themeCssVariables.border.radius.sm};
-  bottom: calc(-1 * ${themeCssVariables.spacing[3]});
-  display: flex;
-  height: ${themeCssVariables.spacing[7]};
-  justify-content: center;
+export const Logo = ({ primaryLogo, secondaryLogo, onClick }: LogoProps) => {
+  // Это порядок опор, а не «главный и второстепенный»: часть экранов передаёт
+  // логотип рабочей области первым полем, часть — вторым. Знак один и тот же.
+  const logo = isNonEmptyString(primaryLogo)
+    ? primaryLogo
+    : isNonEmptyString(secondaryLogo)
+      ? secondaryLogo
+      : null;
 
-  position: absolute;
-  right: calc(-1 * ${themeCssVariables.spacing[3]});
-  width: ${themeCssVariables.spacing[7]};
-`;
+  if (logo === null) {
+    return null;
+  }
 
-const StyledPrimaryLogo = styled.div`
-  background-size: cover;
-  height: 100%;
-  width: 100%;
-`;
-
-export const Logo = ({
-  primaryLogo,
-  secondaryLogo,
-  placeholder,
-  onClick,
-  to = AppPath.SignInUp,
-}: LogoProps) => {
-  const { redirectToDefaultDomain } = useRedirectToDefaultDomain();
-  const defaultPrimaryLogoUrl = `${window.location.origin}/images/icons/android/android-launchericon-192-192.png`;
-
-  const primaryLogoUrl = getImageAbsoluteURI({
-    imageUrl: primaryLogo ?? defaultPrimaryLogoUrl,
+  const logoUrl = getImageAbsoluteURI({
+    imageUrl: logo,
     baseUrl: REACT_APP_SERVER_BASE_URL,
   });
 
-  const secondaryLogoUrl = isNonEmptyString(secondaryLogo)
-    ? getImageAbsoluteURI({
-        imageUrl: secondaryLogo,
-        baseUrl: REACT_APP_SERVER_BASE_URL,
-      })
-    : null;
-
-  const isUsingDefaultLogo = !isDefined(primaryLogo);
-
   return (
     <StyledContainer onClick={() => onClick?.()}>
-      {isUsingDefaultLogo ? (
-        <UndecoratedLink to={to} onClick={() => redirectToDefaultDomain()}>
-          <StyledPrimaryLogo
-            style={{ backgroundImage: `url(${primaryLogoUrl})` }}
-          />
-        </UndecoratedLink>
-      ) : (
-        <StyledPrimaryLogo
-          style={{ backgroundImage: `url(${primaryLogoUrl})` }}
-        />
-      )}
-      {isDefined(secondaryLogoUrl) ? (
-        <StyledSecondaryLogoContainer>
-          <StyledSecondaryLogo src={secondaryLogoUrl} />
-        </StyledSecondaryLogoContainer>
-      ) : (
-        isDefined(placeholder) && (
-          <StyledSecondaryLogoContainer>
-            <Avatar
-              size="lg"
-              placeholder={placeholder}
-              type="squared"
-              placeholderColorSeed={placeholder}
-            />
-          </StyledSecondaryLogoContainer>
-        )
-      )}
+      <StyledLogo src={logoUrl} alt="" />
     </StyledContainer>
   );
 };

@@ -45,11 +45,14 @@ const StyledCardWrapper = styled.div`
   width: fit-content;
 `;
 
+/* [set] Шапка — ровная поверхность из токенов, а не картинка Twenty.
+   Раньше здесь фоном лежал `oauth-modal-header.png` — чужая заставка,
+   в которой нет ни одного нашего цвета. Плитки логотипов на спокойном фоне
+   читаются лучше, чем на узоре, и фон меняется вместе с темой. */
 const StyledHeader = styled.div`
   align-items: center;
-  background-image: url('/images/integrations/oauth-modal-header.png');
-  background-position: center;
-  background-size: cover;
+  background: ${themeCssVariables.background.secondary};
+  border-bottom: 1px solid ${themeCssVariables.border.color.light};
   display: flex;
   gap: ${themeCssVariables.spacing[2]};
   height: ${themeCssVariables.spacing[30]};
