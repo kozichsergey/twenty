@@ -39,6 +39,25 @@
   border: 1px solid var(--t-border-color-strong);
 }
 
+/* [grafit] Точка вместо плашки: цвет остаётся признаком, но перестаёт
+   красить площадь. Отступ слева убран — значение встаёт по левому краю
+   ячейки, как обычный текст, и колонка читается сверху вниз. */
+.variantDot {
+  background: transparent;
+  color: var(--t-font-color-primary);
+  padding: 0;
+  gap: var(--t-spacing-2);
+}
+
+.dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--tag-dot);
+}
+
 .preventShrink {
   min-width: fit-content;
 }

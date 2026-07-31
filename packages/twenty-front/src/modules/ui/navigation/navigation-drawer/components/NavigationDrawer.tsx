@@ -29,10 +29,48 @@ export type NavigationDrawerProps = {
   title: string;
 };
 
+// [grafit] Тёмное шасси.
+//
+// Меню перекрашивается не правкой каждого пункта, а переопределением ролей
+// внутри поддерева: CSS-переменные наследуются, поэтому все вложенные
+// компоненты — пункты, заголовки разделов, счётчики, кнопка поиска — приходят
+// к тёмным цветам сами, и ни один из них править не приходится.
+//
+// Зачем вообще: пока меню было той же бумагой, что и таблица, граница между
+// «где я» и «что я смотрю» держалась на одной линии в пиксель. Тёмная полоса
+// слева читается как корпус, светлое поле справа — как данные.
+//
+// Активный пункт остаётся подсвеченным цветом текста, а не янтарём, хотя
+// в макете он янтарный. Янтарь в системе означает «требуется действие
+// человека»; активный пункт есть на каждом экране всегда, и янтарь на нём
+// обесценил бы все остальные. Тот же выбор сделан в сервисе контрагентов.
+//
+// Всплывающие списки уходят порталом в body и наследования не получают —
+// они остаются светлыми, как остальное содержимое. Это и нужно.
 const StyledAnimatedContainer = styled.div<{
   isExpanded: boolean;
   isResizing: boolean;
 }>`
+  --t-background-primary: var(--t-shassi-fon);
+  --t-background-secondary: var(--t-shassi-fon);
+  --t-background-tertiary: var(--t-shassi-fon-2);
+  --t-background-quaternary: var(--t-shassi-fon-2);
+  --t-background-transparent-lighter: var(--t-shassi-fon-2);
+  --t-background-transparent-light: var(--t-shassi-fon-2);
+  --t-background-transparent-medium: var(--t-shassi-fon-2);
+  --t-background-transparent-strong: var(--t-shassi-fon-2);
+  --t-accent-quaternary: var(--t-shassi-fon-2);
+  --t-accent-tertiary: var(--t-shassi-fon-2);
+  --t-font-color-primary: var(--t-shassi-tekst);
+  --t-font-color-secondary: var(--t-shassi-tishe);
+  --t-font-color-tertiary: var(--t-shassi-tishe);
+  --t-font-color-light: var(--t-shassi-tishe);
+  --t-font-color-extra-light: var(--t-shassi-tishe);
+  --t-border-color-light: var(--t-shassi-fon-2);
+  --t-border-color-medium: var(--t-shassi-fon-2);
+  --t-border-color-strong: var(--t-shassi-fon-2);
+
+  background: var(--t-shassi-fon);
   height: 100%;
   max-height: 100%;
   overflow: hidden;

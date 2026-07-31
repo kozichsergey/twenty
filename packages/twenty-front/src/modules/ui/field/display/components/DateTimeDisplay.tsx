@@ -37,7 +37,7 @@ export const DateTimeDisplay = ({
   });
 
   return (
-    <EllipsisDisplay>
+    <EllipsisDisplay mono>
       {formattedDate}
       <span></span>
       {isNonEmptyString(value) && (

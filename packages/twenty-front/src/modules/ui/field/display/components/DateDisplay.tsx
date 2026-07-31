@@ -22,5 +22,5 @@ export const DateDisplay = ({ value, dateFieldSettings }: DateDisplayProps) => {
     localeCatalog: dateLocale.localeCatalog,
   });
 
-  return <EllipsisDisplay>{formattedDate}</EllipsisDisplay>;
+  return <EllipsisDisplay mono>{formattedDate}</EllipsisDisplay>;
 };

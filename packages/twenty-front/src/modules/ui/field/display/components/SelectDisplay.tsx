@@ -15,9 +15,13 @@ export const SelectDisplay = ({
   Icon,
   preventPadding,
 }: SelectDisplayProps) => {
+  // [grafit] Одиночное значение списка — точка и текст, а не залитая плашка.
+  // Множественные значения и связи остаются плашками: там граница показывает,
+  // где кончается одно значение и начинается другое, а здесь значение одно.
   return (
     <Tag
       preventShrink
+      variant="dot"
       color={color}
       text={label}
       Icon={Icon}

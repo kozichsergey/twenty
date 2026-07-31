@@ -60,7 +60,7 @@ export const CurrencyDisplay = ({
 
   return (
     <>
-      <EllipsisDisplay>
+      <EllipsisDisplay mono>
         {shouldShowCurrencyTooltip && (
           <>
             <StyledCurrencyIconContainer

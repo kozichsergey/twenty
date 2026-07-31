@@ -8,7 +8,18 @@ import { isDefined } from '@ui/utilities/utils/isDefined';
 import styles from './Tag.module.scss';
 
 type TagWeight = 'regular' | 'medium';
-type TagVariant = 'solid' | 'outline' | 'border';
+// [grafit] Вариант «dot»: точка цвета и обычный текст, без плашки.
+//
+// Twenty красит каждое значение списка своей пастелью, и в одной строке
+// оказывается пять залитых плашек, которые спорят между собой: стадия
+// сиреневая, приоритет оранжевый, статус зелёный — и ни один из этих цветов
+// ничего не значит. Точка сохраняет цвет как признак, но перестаёт красить
+// площадь, и строка снова читается слева направо.
+//
+// Плашка остаётся там, где она осмысленна: у связей (компания, контакт)
+// и у множественных значений — там граница показывает, где кончается одно
+// значение и начинается другое.
+type TagVariant = 'solid' | 'outline' | 'border' | 'dot';
 export type TagColor = ThemeColor | 'transparent';
 
 type TagProps = {
@@ -50,8 +61,16 @@ export const Tag = ({
 
   const isInteractive = isDefined(onClick);
 
+  // Точке нужен сплошной цвет семейства, а не приглушённый цвет текста:
+  // на семи пикселях приглушённый читается как серый.
+  const tagDot =
+    color === 'transparent'
+      ? themeCssVariables.font.color.light
+      : (themeCssVariables.color[color] ?? themeCssVariables.font.color.light);
+
   const tagContent = (
     <>
+      {variant === 'dot' ? <span className={styles.dot} aria-hidden /> : <></>}
       {isDefined(Icon) ? (
         <div className={styles.iconContainer}>
           <Icon
@@ -76,6 +95,7 @@ export const Tag = ({
   const sharedStyle = {
     '--tag-background': tagBackground,
     '--tag-text': tagText,
+    '--tag-dot': tagDot,
   } as React.CSSProperties;
 
   const sharedClassName = clsx(
@@ -83,6 +103,7 @@ export const Tag = ({
     weight === 'medium' && styles.weightMedium,
     variant === 'outline' && styles.variantOutline,
     variant === 'border' && styles.variantBorder,
+    variant === 'dot' && styles.variantDot,
     preventShrink && styles.preventShrink,
     preventPadding && styles.preventPadding,
     className,

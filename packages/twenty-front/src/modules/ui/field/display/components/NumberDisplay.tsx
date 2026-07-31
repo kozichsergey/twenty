@@ -6,5 +6,5 @@ type NumberDisplayProps = {
 };
 
 export const NumberDisplay = ({ value }: NumberDisplayProps) => (
-  <EllipsisDisplay>{value}</EllipsisDisplay>
+  <EllipsisDisplay mono>{value}</EllipsisDisplay>
 );

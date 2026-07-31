@@ -1007,6 +1007,11 @@
   --t-color-transparent-amber10: #ffa013;
   --t-color-transparent-amber11: #ffa41c;
   --t-color-transparent-amber12: #ffe2b6;
+  --t-shassi-fon: #12100d;
+  --t-shassi-fon-2: #201d18;
+  --t-shassi-tekst: #f0ece5;
+  --t-shassi-tishe: #7d7669;
+  --t-font-family-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 /* Squircle corners: progressive enhancement for browsers supporting
