@@ -1,6 +1,7 @@
 import ReactDOM from 'react-dom/client';
 
 import { App } from '@/app/components/App';
+import { perezagruzitPosleVykladki } from '@/app/utils/perezagruzitPosleVykladki';
 import { migrateTokenPairCookieToLocalStorage } from '@/auth/utils/migrateTokenPairCookieToLocalStorage';
 import { hydrateMetadataStore } from '@/metadata-store/storage/metadataStoreStorage';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -8,6 +9,10 @@ import 'twenty-ui/style.css';
 import 'twenty-ui/theme-light.css';
 import 'twenty-ui/theme-dark.css';
 import './index.css';
+
+// [set] Ставится до отрисовки: вкладка, открытая до выкладки, спотыкается
+// о переименованные куски сборки при первом же переходе, а не когда-нибудь.
+perezagruzitPosleVykladki();
 
 // TODO: REMOVE this after 2026-12-12 — temporary migration of tokenPair from the
 // legacy cookie to localStorage (legacy cookie has a 180-day expiry).
