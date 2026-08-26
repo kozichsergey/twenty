@@ -1,6 +1,7 @@
 import { currentWorkspaceState } from '@/auth/states/currentWorkspaceState';
 import { MainNavigationDrawerNavigationContent } from '@/navigation/components/MainNavigationDrawerNavigationContent';
 import { MainNavigationDrawerTabsRow } from '@/navigation/components/MainNavigationDrawerTabsRow';
+import { GRAFIT_POKAZYVAT_VKLADKI_II_CHATA } from '@/navigation/constants/GrafitNavigationTabs';
 import { NavigationDrawerTabbedContent } from '@/navigation/components/NavigationDrawerTabbedContent';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { NavigationDrawer } from '@/ui/navigation/navigation-drawer/components/NavigationDrawer';
@@ -18,7 +19,10 @@ export const MainNavigationDrawer = ({ className }: { className?: string }) => {
   const currentWorkspace = useAtomStateValue(currentWorkspaceState);
   const hasAiPermission = useHasPermissionFlag(PermissionFlagType.AI);
 
+  // [grafit] Со спрятанной строкой вкладок вернуться из чата было бы нечем,
+  // поэтому при выключенном признаке меню всегда показывает разделы.
   const showAiChatContent =
+    GRAFIT_POKAZYVAT_VKLADKI_II_CHATA &&
     hasAiPermission &&
     navigationDrawerActiveTab === NAVIGATION_DRAWER_TABS.AI_CHAT_HISTORY;
 
@@ -27,9 +31,11 @@ export const MainNavigationDrawer = ({ className }: { className?: string }) => {
       className={className}
       title={currentWorkspace?.displayName ?? ''}
     >
-      <NavigationDrawerFixedContent>
-        <MainNavigationDrawerTabsRow />
-      </NavigationDrawerFixedContent>
+      {GRAFIT_POKAZYVAT_VKLADKI_II_CHATA && (
+        <NavigationDrawerFixedContent>
+          <MainNavigationDrawerTabsRow />
+        </NavigationDrawerFixedContent>
+      )}
 
       <NavigationDrawerScrollableContent>
         <NavigationDrawerTabbedContent

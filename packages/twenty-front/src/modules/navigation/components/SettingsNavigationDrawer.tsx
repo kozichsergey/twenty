@@ -1,4 +1,5 @@
 import { MainNavigationDrawerTabsRow } from '@/navigation/components/MainNavigationDrawerTabsRow';
+import { GRAFIT_POKAZYVAT_VKLADKI_II_CHATA } from '@/navigation/constants/GrafitNavigationTabs';
 import { NavigationDrawerTabbedContent } from '@/navigation/components/NavigationDrawerTabbedContent';
 import { useHasPermissionFlag } from '@/settings/roles/hooks/useHasPermissionFlag';
 import { SettingsNavigationDrawerItems } from '@/settings/components/SettingsNavigationDrawerItems';
@@ -48,13 +49,16 @@ export const SettingsNavigationDrawer = ({
   );
   const hasAiPermission = useHasPermissionFlag(PermissionFlagType.AI);
 
+  // [grafit] См. `GrafitNavigationTabs`: вкладки спрятаны, и без них
+  // из чата было бы не выйти.
   const showAiChatContent =
+    GRAFIT_POKAZYVAT_VKLADKI_II_CHATA &&
     hasAiPermission &&
     navigationDrawerActiveTab === NAVIGATION_DRAWER_TABS.AI_CHAT_HISTORY;
 
   return (
     <NavigationDrawer className={className} title={t`Settings`}>
-      {hasAiPermission && (
+      {GRAFIT_POKAZYVAT_VKLADKI_II_CHATA && hasAiPermission && (
         <NavigationDrawerFixedContent>
           <MainNavigationDrawerTabsRow
             NavigationMenuTabIcon={IconSettings}
